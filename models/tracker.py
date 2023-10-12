@@ -1,6 +1,7 @@
 import numpy as np
-from models.kalman import KalmanFilter
 from scipy.optimize import linear_sum_assignment
+
+from models.kalman import KalmanFilter
 
 
 class Track(object):
@@ -18,7 +19,7 @@ class Track(object):
             None
         """
         self.track_id = trackIdCount  # identification of each track object
-        self.KF = KalmanFilter(0.2, 0.1, 1, 1, 0.3,0.2)  # KF instance to track this object
+        self.KF = KalmanFilter(0.2, 0.1, 1, 1, 0.3, 0.2)  # KF instance to track this object
         self.prediction = np.asarray(prediction)  # predicted centroids (x,y)
         self.trace = []  # trace path
         self.counted = False
@@ -78,16 +79,16 @@ class Tracker(object):
         # predicted vs detected centroids
         N = len(self.tracks)
         M = len(detections)
-        cost = np.zeros(shape=(N, M))   # Cost matrix
+        cost = np.zeros(shape=(N, M))  # Cost matrix
         for i in range(len(self.tracks)):
             for j in range(len(detections)):
                 try:
                     diff = self.tracks[i].prediction - detections[j]
                     diff = diff.tolist()[0]
-                    if type(diff)!= list:
+                    if type(diff) != list:
                         diff = [0.0, 0.0]
-                    distance = np.sqrt(diff[0]*diff[0] +
-                                       diff[1]*diff[1])
+                    distance = np.sqrt(diff[0] * diff[0] +
+                                       diff[1] * diff[1])
                     cost[i][j] = distance
                 except Exception as e:
                     print(e)
@@ -103,7 +104,7 @@ class Tracker(object):
         row_ind, col_ind = linear_sum_assignment(cost)
         for i in range(len(row_ind)):
             assignment[row_ind[i]] = col_ind[i]
-        
+
         un_assigned_tracks = []
         for i in range(len(assignment)):
             if (assignment[i] != -1):
@@ -115,7 +116,7 @@ class Tracker(object):
                     un_assigned_tracks.append(i)
             else:
                 self.tracks[i].skipped_frames += 1
-        
+
         del_tracks = []
         for i in range(len(self.tracks)):
             if (self.tracks[i].skipped_frames > self.max_frames_to_skip):
@@ -131,11 +132,11 @@ class Tracker(object):
         # Now look for un_assigned detects
         un_assigned_detects = []
         for i in range(len(detections)):
-                if i not in assignment:
-                    un_assigned_detects.append(i)
+            if i not in assignment:
+                un_assigned_detects.append(i)
 
         # Start new tracks
-        if(len(un_assigned_detects) != 0):
+        if (len(un_assigned_detects) != 0):
             for i in range(len(un_assigned_detects)):
                 track = Track(detections[un_assigned_detects[i]],
                               self.trackIdCount)
@@ -146,21 +147,20 @@ class Tracker(object):
         for i in range(len(assignment)):
             self.tracks[i].KF.predict()
 
-            if(assignment[i] != -1):
+            if (assignment[i] != -1):
                 self.tracks[i].prediction = self.tracks[i].KF.update(
-                                            detections[assignment[i]])
+                    detections[assignment[i]])
 
             else:
-                #del self.tracks[i]
+                # del self.tracks[i]
                 pass
-                #self.tracks[i].prediction = self.tracks[i].KF.update(
+                # self.tracks[i].prediction = self.tracks[i].KF.update(
                 #                            np.array([[0], [0]]))
 
-            if(len(self.tracks[i].trace) > self.max_trace_length):
+            if (len(self.tracks[i].trace) > self.max_trace_length):
                 for j in range(len(self.tracks[i].trace) -
                                self.max_trace_length):
                     del self.tracks[i].trace[j]
 
             self.tracks[i].trace.append(self.tracks[i].prediction)
             self.tracks[i].KF.lastResult = self.tracks[i].prediction
-

@@ -1,10 +1,10 @@
-from PyQt5.QtCore import QThread
-from PyQt5 import QtCore
 from queue import Queue
+
+from PyQt5 import QtCore
+from PyQt5.QtCore import QThread
 
 
 class ResultsHandler(QThread):
-    
     sendFrame = QtCore.pyqtSignal(object)
     sendValuesToView = QtCore.pyqtSignal(object)
     sendValuesToDataIter = QtCore.pyqtSignal(object)
@@ -12,7 +12,7 @@ class ResultsHandler(QThread):
     def __init__(self):
         super().__init__()
         self.resultsQueue = Queue(5)
-    
+
     def run(self):
         while not self.isInterruptionRequested():
             frame, obj_count = self.resultsQueue.cat()
@@ -28,9 +28,8 @@ class ResultsHandler(QThread):
         data["obj_quantity"] = objects
         return data
 
-
     def __del__(self):
-        try: 
+        try:
             self.sendFrame.disconnect()
             self.sendValuesToView.disconnect()
         except Exception as e:

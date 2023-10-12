@@ -1,18 +1,17 @@
-#External
-from PyQt5.QtCore import QThread, pyqtSignal
-import cv2
-import numpy as np
-from dotenv import load_dotenv, find_dotenv
-#Built-In
+# External
+# Built-In
 import os
-from pathlib import Path
-from time import time
 from queue import Queue
 
+import cv2
+import numpy as np
+from PyQt5.QtCore import QThread, pyqtSignal
+from dotenv import load_dotenv, find_dotenv
 
 
 class Detector(QThread):
     sendInferences = pyqtSignal(object)
+
     def __init__(self) -> None:
         super().__init__()
         load_dotenv(find_dotenv())
@@ -31,7 +30,7 @@ class Detector(QThread):
     @staticmethod
     def _load_labels(labels_path: str):
 
-        with open(labels_path,'r') as labels_file:
+        with open(labels_path, 'r') as labels_file:
             labels = labels_file.read()
         labels = labels.split("\n")
         labels = list(map(lambda x: x.strip(), labels))
@@ -41,10 +40,10 @@ class Detector(QThread):
 
     def _get_layers_names(self):
         layers_names = self.model.getLayerNames()
-        layers_names = [layers_names[i-1] for i in self.model.getUnconnectedOutLayers()]
+        layers_names = [layers_names[i - 1] for i in self.model.getUnconnectedOutLayers()]
         return layers_names
 
-    def inference(self, inputs)-> np.array:
+    def inference(self, inputs) -> np.array:
         if not isinstance(inputs, np.ndarray) and len(inputs) == 1:
             inputs = inputs.pop()
 
@@ -77,13 +76,12 @@ class Detector(QThread):
 
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.conf_threshold,
                                    self.nms_threshold)
-                                   
+
         if len(indices) > 0:
             for i in indices:
                 box = boxes[i]
                 detections.append((box, confidences[i], self.labels[class_ids[i]]))
         return detections
-
 
     def run(self):
         while not self.isInterruptionRequested():
@@ -91,10 +89,9 @@ class Detector(QThread):
                 item = self.frameQueue.get()
                 results = []
                 results = self.inference(item)
-                self.sendInferences.emit([results, item])    
+                self.sendInferences.emit([results, item])
             else:
                 self.yieldCurrentThread()
-    
 
     def receiveFrame(self, frame):
         if frame is not None:

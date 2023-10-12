@@ -10,10 +10,8 @@ os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath
 )
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     app = PyQt5.QtWidgets.QApplication(sys.argv)
-    controller =  MainController()
+    controller = MainController()
     controller.run()
     sys.exit(app.exec_())
-

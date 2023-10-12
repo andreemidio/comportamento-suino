@@ -1,13 +1,14 @@
 from queue import Queue
 from typing import Any, NoReturn
 
+
 class QMQT():
 
-    def __init__(self, buffer = 100) -> NoReturn:
+    def __init__(self, buffer=100) -> NoReturn:
         self._Q = Queue(buffer)
         self.queue = self._Q.queue
 
-    def collect(self, item)-> NoReturn:
+    def collect(self, item) -> NoReturn:
         """
         args: Any value
         --------------
@@ -15,8 +16,7 @@ class QMQT():
         """
         self._Q.put(item)
 
-        
-    def clear(self)-> NoReturn:
+    def clear(self) -> NoReturn:
         """
         args: don't have
         --------------
@@ -24,7 +24,7 @@ class QMQT():
         """
         self._Q.empty()
 
-    def cat(self)-> Any:
+    def cat(self) -> Any:
         """
         arg: don't have
         --------------
@@ -32,7 +32,7 @@ class QMQT():
         """
         return self._Q.get()
 
-    def get_size(self)-> int:
+    def get_size(self) -> int:
         """
         arg: don't have
         --------------

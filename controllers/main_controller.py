@@ -1,7 +1,6 @@
 from PyQt5.QtCore import QObject
 
 from models.manager import Manager
-from models.resultshandler import ResultsHandler
 from views.view import MainWindow
 
 
