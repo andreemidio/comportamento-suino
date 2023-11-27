@@ -84,10 +84,29 @@ class Detector(QThread):
         return detections
 
     def run(self):
+
+        bbox_bebedouro = [40, 88, 20, 20]
+        x_bebedouro, y_bebedouro, width_bebedouro, height_bebedouro = map(int, bbox_bebedouro)
+
+        bbox_comedouro = [40, 185, 60, 40]
+        x_comedouro, y_comedouro, width_comedouro, height_comedouro = map(int, bbox_comedouro)
+
         while not self.isInterruptionRequested():
             if not self.frameQueue.empty():
                 item = self.frameQueue.get()
                 results = []
+
+                cv2.rectangle(item,
+                              (x_bebedouro, y_bebedouro),
+                              (x_bebedouro + width_bebedouro, y_bebedouro + height_bebedouro),
+                              color=(255, 0, 0),
+                              thickness=1)
+                cv2.rectangle(item,
+                              (x_comedouro, y_comedouro),
+                              (x_comedouro + width_comedouro, y_comedouro + height_comedouro),
+                              color=(0, 255, 0),
+                              thickness=1)
+
                 results = self.inference(item)
                 self.sendInferences.emit([results, item])
             else:
